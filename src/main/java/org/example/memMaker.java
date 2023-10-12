@@ -6,15 +6,20 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.*;
 
 public class memMaker {
     private String[] args;
     private ArrayList<String> commandsDescriptionsList;
+    private Map<String, Float> textPosition;
 
     public memMaker(String[] args) {
+        textPosition = new HashMap<String, Float>();
+        textPosition.put("bottom", 0.8f);
+        textPosition.put("center", 0.5f);
+        textPosition.put("top", 0.2f);
         commandsDescriptionsList = new ArrayList<>();
-        commandsDescriptionsList.add("mem - create a meme with your picture and text args:(imagePath, text)");
+        commandsDescriptionsList.add("mem - create a meme with your picture and text. args:(imagePath, text, textPosition)");
         this.args = args;
     }
 
@@ -38,23 +43,20 @@ public class memMaker {
             image = ImageIO.read(new File(args[1]));//args[1])
         }catch (IOException e){
             System.out.println("Image open error");
-        }catch (IllegalArgumentException e){
-            System.out.println("Input is null");
-
         }
-        //BufferedImage image = ImageIO.read(new File(args[1]));
-        //BufferedImage image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
         Graphics g = image.createGraphics();
         g.setColor(Color.WHITE);
-        g.setFont(Font.getFont("Arial"));
-        g.getFontMetrics()
-        g.drawString(args[2], image.getWidth()/2, image.getHeight()/10 * 8);
+        g.setFont(new Font("Arial", Font.BOLD, 50));
+        if (args.length > 3)
+            g.drawString(args[2], image.getWidth()/3, (int) (image.getHeight() * textPosition.get(args[3])));
+        else
+            g.drawString(args[2], image.getWidth()/3, image.getHeight()/10 * 8);
         g.dispose();
         try {
-            ImageIO.write(image, "png", new File("result.png"));
+            ImageIO.write(image, "png", new File("result.png"));//заменить pathname на args[1] чтобы заменять картинку, а не создавать новую
         }catch (IOException e){
-        System.out.println("Image save error");
-    }
+            System.out.println("Image save error");
+        }
     }
 
     public void printHelp(ArrayList<String> commandsDescriptionsList) {
