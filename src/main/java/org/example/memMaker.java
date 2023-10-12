@@ -11,14 +11,16 @@ import java.util.*;
 public class memMaker {
     private String[] args;
     private ArrayList<String> commandsDescriptionsList;
-    private float textPosition = 0.8f;
+    private float textPosition;
 
-    private int fontSize = 25;
+    private int fontSize;
 
     public memMaker(String[] args) {
 
         commandsDescriptionsList = new ArrayList<>();
-        commandsDescriptionsList.add("mem - create a meme with your picture and text. args:(imagePath, text[, textPosition, fontSize]). Example: mem image.jpg memtext textposition:center fontsize:25");
+        commandsDescriptionsList.add("mem - create a meme with your picture and text. args:(imagePath, text[, textPosition, fontSize]).\n" +
+                "Example: mem image.jpg memtext textposition:center fontsize:25 \n "+
+                "Text position options:top, center, bottom ");
         this.args = args;
     }
 
@@ -38,13 +40,15 @@ public class memMaker {
     }
 
     public void argsConventer(){
+        textPosition = 0.8f;
+        fontSize = 25;
         Map<String, Float> textPositions = new HashMap<String, Float>();
         textPositions.put("bottom", 0.8f);
         textPositions.put("center", 0.5f);
         textPositions.put("top", 0.2f);
         for (String arg:args){
 
-            if(arg.indexOf("textsosition:") != -1){
+            if(arg.toLowerCase().indexOf("textposition:") != -1){
                 textPosition = textPositions.get(arg.substring(arg.indexOf(':') + 1));
             }
             if(arg.toLowerCase().indexOf("fontsize:") != -1){
@@ -66,10 +70,7 @@ public class memMaker {
         Graphics g = image.createGraphics();
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, fontSize));
-        if (args.length > 3)
-            g.drawString(args[2], image.getWidth()/3, (int) (image.getHeight() * textPosition));
-        else
-            g.drawString(args[2], image.getWidth()/3, image.getHeight()/10 * 8);
+        g.drawString(args[2], image.getWidth()/3, (int) (image.getHeight() * textPosition));
         g.dispose();
         try {
             ImageIO.write(image, "png", new File("result.png"));//заменить pathname на args[1] чтобы заменять картинку, а не создавать новую
