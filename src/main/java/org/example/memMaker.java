@@ -11,15 +11,14 @@ import java.util.*;
 public class memMaker {
     private String[] args;
     private ArrayList<String> commandsDescriptionsList;
-    private Map<String, Float> textPosition;
+    private float textPosition = 0.8f;
+
+    private int fontSize = 25;
 
     public memMaker(String[] args) {
-        textPosition = new HashMap<String, Float>();
-        textPosition.put("bottom", 0.8f);
-        textPosition.put("center", 0.5f);
-        textPosition.put("top", 0.2f);
+
         commandsDescriptionsList = new ArrayList<>();
-        commandsDescriptionsList.add("mem - create a meme with your picture and text. args:(imagePath, text, textPosition)");
+        commandsDescriptionsList.add("mem - create a meme with your picture and text. args:(imagePath, text[, textPosition, fontSize]). Example: mem image.jpg memtext textposition:center fontsize:25");
         this.args = args;
     }
 
@@ -32,23 +31,43 @@ public class memMaker {
                 printHelp(commandsDescriptionsList);
             }
             else if(args[0].equals("mem")){
+                argsConventer();
                 createMeme();
             }
         }
     }
 
+    public void argsConventer(){
+        Map<String, Float> textPositions = new HashMap<String, Float>();
+        textPositions.put("bottom", 0.8f);
+        textPositions.put("center", 0.5f);
+        textPositions.put("top", 0.2f);
+        for (String arg:args){
+
+            if(arg.indexOf("textsosition:") != -1){
+                textPosition = textPositions.get(arg.substring(arg.indexOf(':') + 1));
+            }
+            if(arg.toLowerCase().indexOf("fontsize:") != -1){
+                fontSize = Integer.parseInt(arg.substring(arg.indexOf(':') + 1));
+            }
+        }
+
+    }
+
     public void createMeme() {
-        BufferedImage image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);;
+        BufferedImage image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
         try {
-            image = ImageIO.read(new File(args[1]));//args[1])
+            image = ImageIO.read(new File(args[1]));
         }catch (IOException e){
             System.out.println("Image open error");
+            e.printStackTrace();
+            //return;
         }
         Graphics g = image.createGraphics();
         g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 50));
+        g.setFont(new Font("Arial", Font.BOLD, fontSize));
         if (args.length > 3)
-            g.drawString(args[2], image.getWidth()/3, (int) (image.getHeight() * textPosition.get(args[3])));
+            g.drawString(args[2], image.getWidth()/3, (int) (image.getHeight() * textPosition));
         else
             g.drawString(args[2], image.getWidth()/3, image.getHeight()/10 * 8);
         g.dispose();
